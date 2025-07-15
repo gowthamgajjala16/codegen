@@ -1,0 +1,53 @@
+module mealy_seq_detector_1011 (
+    input wire clk,
+    input wire reset,
+    input wire in,
+    output reg out
+);
+
+    // Define states
+    typedef enum logic [1:0] {
+        S0, // Initial state
+        S1, // Got '1'
+        S2, // Got '10'
+        S3  // Got '101'
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // State register
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            current_state <= S0;
+        else
+            current_state <= next_state;
+    end
+
+    // Next state logic and output logic (Mealy)
+    always @(*) begin
+        out = 1'b0;
+        case (current_state)
+            S0: begin
+                next_state = (in == 1) ? S1 : S0;
+            end
+            S1: begin
+                next_state = (in == 0) ? S2 : S1;
+            end
+            S2: begin
+                next_state = (in == 1) ? S3 : S0;
+            end
+            S3: begin
+                if (in == 1) begin
+                    next_state = S1;
+                    out = 1'b1; // Sequence 1011 detected
+                end else begin
+                    next_state = S2;
+                end
+            end
+            default: begin
+                next_state = S0;
+            end
+        endcase
+    end
+
+endmodule
