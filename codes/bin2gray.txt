@@ -1,9 +1,3 @@
-//==============================================================
-// Module      : binary_to_gray
-// Description : Converts a binary input into equivalent Gray code
-// Author      : LLM Verilog Dataset
-//==============================================================
-
 module binary_to_gray #(
     parameter WIDTH = 16  // Default width is 16-bit
 )(
@@ -11,15 +5,15 @@ module binary_to_gray #(
     output wire [WIDTH-1:0] gray_out    // Gray code output
 );
 
+    // MSB remains the same in Gray code
+    assign gray_out[WIDTH-1] = binary_in[WIDTH-1];
+
     // Internal logic: XOR each bit with the next higher bit
     genvar i;
     generate
-        for (i = WIDTH-1; i > 0; i = i - 1) begin : gray_loop
-            assign gray_out[i] = binary_in[i] ^ binary_in[i-1];
+        for (i = WIDTH-2; i >= 0; i = i - 1) begin : gray_loop
+            assign gray_out[i] = binary_in[i+1] ^ binary_in[i];
         end
     endgenerate
-
-    // MSB remains the same in Gray code
-    assign gray_out[0] = binary_in[0];
 
 endmodule
