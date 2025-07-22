@@ -1,0 +1,24 @@
+module moore_101 (
+    input clk, reset, x,
+    output reg y
+);
+    typedef enum reg [1:0] {IDLE, S1, S2, S3} state_t;
+    state_t state, next;
+
+    always @(posedge clk or posedge reset)
+        if (reset) state <= IDLE;
+        else state <= next;
+
+    always @(*) begin
+        case (state)
+            IDLE: next = x ? S1 : IDLE;
+            S1:   next = x ? S1 : S2;
+            S2:   next = x ? S3 : IDLE;
+            S3:   next = x ? S1 : S2;
+        endcase
+    end
+
+    always @(*) begin
+        y = (state == S3);
+    end
+endmodule
