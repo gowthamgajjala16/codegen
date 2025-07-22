@@ -1,0 +1,25 @@
+module mealy_1011 (
+    input clk, reset, x,
+    output reg y
+);
+    typedef enum reg [1:0] {S0, S1, S2, S3} state_t;
+    state_t state;
+
+    always @(posedge clk or posedge reset)
+        if (reset) state <= S0;
+        else begin
+            case (state)
+                S0: state <= x ? S1 : S0;
+                S1: state <= x ? S1 : S2;
+                S2: state <= x ? S3 : S0;
+                S3: state <= x ? S1 : S2;
+            endcase
+        end
+
+    always @(*) begin
+        case (state)
+            S3: y = x;  // Output 1 on last '1' of 1011
+            default: y = 0;
+        endcase
+    end
+endmodule
